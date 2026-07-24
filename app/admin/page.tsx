@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Upload, Settings, Film, Image, Music, ToggleLeft, ToggleRight, ChevronDown, ChevronUp } from 'lucide-react';
 import VideoUploader from '@/components/admin/VideoUploader';
+import ThumbnailUploader from '@/components/admin/ThumbnailUploader';
+import PhotoUploader from '@/components/admin/PhotoUploader';
 
 const ADMIN_PASSWORD = 'memflix2024';
 
@@ -60,7 +62,7 @@ export default function AdminPage() {
               <Lock size={28} className="text-[#E50914]" />
             </div>
             <h1 className="text-3xl font-black text-white mb-2">Admin Panel</h1>
-            <p className="text-[#808080] text-sm">MEMFLIX — For authorized personnel only 🔐</p>
+            <p className="text-[#808080] text-sm">TanyaTV — For authorized personnel only 🔐</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -91,7 +93,7 @@ export default function AdminPage() {
           </form>
 
           <p className="text-center text-[#555] text-xs mt-6">
-            Access restricted. This page is for managing MEMFLIX content.
+            Access restricted. This page is for managing TanyaTV content.
           </p>
         </motion.div>
       </div>
@@ -103,14 +105,14 @@ export default function AdminPage() {
       <div className="border-b border-white/10">
         <div className="px-4 md:px-12 py-4 flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <span className="text-[#E50914] text-xl font-black" style={{ fontFamily: 'Georgia, serif' }}>MEMFLIX</span>
+            <span className="text-[#E50914] text-xl font-black" style={{ fontFamily: 'Georgia, serif' }}>TanyaTV</span>
             <span className="text-[#808080] text-sm">Admin Panel</span>
           </div>
           <button
             onClick={() => router.push('/home')}
             className="text-sm text-[#808080] hover:text-white transition-colors"
           >
-            ← Back to MEMFLIX
+            ← Back to TanyaTV
           </button>
         </div>
       </div>
@@ -196,28 +198,11 @@ export default function AdminPage() {
 
             <VideoUploader />
 
-            {[
-              { label: 'Upload Photo', icon: Image, hint: 'Add to gallery or polaroid wall' },
-              { label: 'Add Voice Note', icon: Music, hint: 'Record or upload audio' },
-            ].map(action => (
-              <motion.div
-                key={action.label}
-                className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 cursor-pointer hover:border-[#E50914]/30 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-9 h-9 bg-[#E50914]/20 rounded-lg flex items-center justify-center">
-                    <action.icon size={16} className="text-[#E50914]" />
-                  </div>
-                  <span className="text-white text-sm font-medium">{action.label}</span>
-                </div>
-                <p className="text-[#808080] text-xs">{action.hint}</p>
-                <div className="mt-3 w-full border border-dashed border-white/20 rounded-lg py-3 text-center text-[#555] text-xs hover:border-[#E50914]/40 transition-colors">
-                  Drop file or click to upload
-                </div>
-              </motion.div>
-            ))}
+            <ThumbnailUploader />
+
+            <PhotoUploader kind="gallery" />
+
+            <PhotoUploader kind="polaroid" />
 
             {/* Stats */}
             <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5">

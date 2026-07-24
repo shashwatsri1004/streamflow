@@ -47,7 +47,7 @@ export default function HeroBanner({ onPlay, onInfo }: HeroBannerProps) {
             className="text-[#E50914] text-xs font-black tracking-widest uppercase"
             style={{ fontFamily: 'Georgia, serif' }}
           >
-            MEMFLIX
+            TanyaTV
           </span>
           <span className="w-1 h-1 bg-[#808080] rounded-full" />
           <span className="text-[#b3b3b3] text-xs tracking-widest uppercase">Original</span>

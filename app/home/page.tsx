@@ -89,7 +89,7 @@ export default function HomePage() {
           <p className="text-[#808080] text-sm">
             Made with ❤️ exclusively for you. No subscription required. Free forever.
           </p>
-          <p className="text-[#555] text-xs mt-2">MEMFLIX © {new Date().getFullYear()} — Every Love Story Deserves Its Own Streaming Service</p>
+          <p className="text-[#555] text-xs mt-2">TanyaTV © {new Date().getFullYear()} — Every Love Story Deserves Its Own Streaming Service</p>
         </motion.div>
       </div>
 

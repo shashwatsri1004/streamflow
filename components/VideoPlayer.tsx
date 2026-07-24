@@ -176,7 +176,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
           exit={{ opacity: 0 }}
           onMouseMove={handleMouseMove}
         >
-          {/* MEMFLIX intro */}
+          {/* TanyaTV intro */}
           <AnimatePresence>
             {showIntro && (
               <motion.div
@@ -196,7 +196,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                       textShadow: '0 0 60px rgba(229,9,20,1), 0 0 120px rgba(229,9,20,0.5)',
                     }}
                   >
-                    MEMFLIX
+                    TanyaTV
                   </span>
                 </motion.div>
               </motion.div>
@@ -250,7 +250,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                   >
-                    A MEMFLIX Original
+                    A TanyaTV Original
                   </motion.p>
                   {CREDITS.map((credit, i) => (
                     <motion.div

@@ -5,10 +5,10 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] });
 
 export const metadata: Metadata = {
-  title: 'MEMFLIX — Every Love Story Deserves Its Own Streaming Service',
+  title: 'TanyaTV — Every Love Story Deserves Its Own Streaming Service',
   description: 'A personalized streaming platform built exclusively for the most beautiful girl in the world.',
   openGraph: {
-    title: 'MEMFLIX',
+    title: 'TanyaTV',
     description: 'Every Love Story Deserves Its Own Streaming Service.',
   },
 };

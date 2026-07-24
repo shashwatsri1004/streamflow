@@ -78,7 +78,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
               letterSpacing: '-2px',
             }}
           >
-            MEMFLIX
+            TanyaTV
           </span>
           <motion.div
             className="absolute inset-0 text-7xl md:text-9xl font-black tracking-tight text-[#E50914] opacity-20"
@@ -90,7 +90,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             animate={{ opacity: [0.1, 0.4, 0.1] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            MEMFLIX
+            TanyaTV
           </motion.div>
         </div>
         <motion.p

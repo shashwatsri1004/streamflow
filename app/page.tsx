@@ -58,7 +58,7 @@ export default function ProfilePage() {
           ))}
 
           <div className="relative z-10 text-center">
-            {/* MEMFLIX logo */}
+            {/* TanyaTV logo */}
             <motion.div
               className="mb-16"
               initial={{ opacity: 0, y: -30 }}
@@ -72,7 +72,7 @@ export default function ProfilePage() {
                   textShadow: '0 0 30px rgba(229,9,20,0.6)',
                 }}
               >
-                MEMFLIX
+                TanyaTV
               </span>
             </motion.div>
 

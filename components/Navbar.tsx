@@ -71,7 +71,7 @@ export default function Navbar() {
             className="text-2xl md:text-3xl font-black text-[#E50914] tracking-tight"
             style={{ fontFamily: 'Georgia, serif', textShadow: '0 0 20px rgba(229,9,20,0.5)' }}
           >
-            MEMFLIX
+            TanyaTV
           </span>
         </Link>
 

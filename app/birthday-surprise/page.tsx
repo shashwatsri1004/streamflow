@@ -165,7 +165,7 @@ export default function BirthdaySurprisePage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 200, delay: 0.3 }}
             >
-              <p className="text-[#E50914] text-sm font-semibold uppercase tracking-widest mb-4">MEMFLIX Presents</p>
+              <p className="text-[#E50914] text-sm font-semibold uppercase tracking-widest mb-4">TanyaTV Presents</p>
               <h1
                 className="text-5xl md:text-8xl font-black text-white mb-6"
                 style={{ textShadow: '0 0 60px rgba(229,9,20,0.6), 0 0 120px rgba(229,9,20,0.3)' }}
@@ -180,7 +180,7 @@ export default function BirthdaySurprisePage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
               >
-                A MEMFLIX Original — For You, Always.
+                A TanyaTV Original — For You, Always.
               </motion.p>
               <motion.button
                 onClick={() => setPhase('slideshow')}
@@ -357,7 +357,7 @@ export default function BirthdaySurprisePage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Back to MEMFLIX
+                    Back to TanyaTV
                   </motion.button>
                 </Link>
               </motion.div>

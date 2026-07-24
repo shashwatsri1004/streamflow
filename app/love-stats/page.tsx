@@ -65,7 +65,7 @@ export default function LoveStatsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="text-[#E50914] text-xs font-semibold uppercase tracking-widest">MEMFLIX Analytics</span>
+          <span className="text-[#E50914] text-xs font-semibold uppercase tracking-widest">TanyaTV Analytics</span>
           <h1 className="text-4xl md:text-6xl font-black text-white mt-2 mb-4">Love Stats</h1>
           <p className="text-[#808080] text-lg">Because love deserves to be measured — even when no number is big enough.</p>
         </motion.div>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Plus, ThumbsUp, ChevronDown, Heart } from 'lucide-react';
 import { Movie } from '@/lib/data';
+import { useThumbnails } from '@/lib/useMediaAssets';
 
 interface MovieCardProps {
   movie: Movie;
@@ -11,6 +12,8 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie, onSelect, index }: MovieCardProps) {
+  const { thumbnails } = useThumbnails();
+  const thumbnail = thumbnails[movie.id] || movie.image;
   const [hovered, setHovered] = useState(false);
   const [liked, setLiked] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -52,7 +55,7 @@ export default function MovieCard({ movie, onSelect, index }: MovieCardProps) {
         {/* Thumbnail */}
         <div className="aspect-[16/9] bg-[#2a2a2a] overflow-hidden">
           <img
-            src={movie.image}
+            src={thumbnail || "/placeholder.svg"}
             alt={movie.title}
             className="w-full h-full object-cover transition-transform duration-300"
             style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)' }}

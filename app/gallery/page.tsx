@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import CursorEffect from '@/components/CursorEffect';
 import { Heart, X, ZoomIn } from 'lucide-react';
+import { usePhotos } from '@/lib/useMediaAssets';
 
 const GALLERY_PHOTOS = [
   { id: 1, src: 'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=600', tall: true },
@@ -20,13 +21,26 @@ const GALLERY_PHOTOS = [
   { id: 12, src: 'https://images.pexels.com/photos/1805053/pexels-photo-1805053.jpeg?auto=compress&cs=tinysrgb&w=600', tall: false },
 ];
 
-export default function GalleryPage() {
-  const [lightbox, setLightbox] = useState<typeof GALLERY_PHOTOS[0] | null>(null);
-  const [liked, setLiked] = useState<number[]>([]);
+interface GalleryItem {
+  key: string;
+  src: string;
+  tall: boolean;
+}
 
-  const toggleLike = (id: number, e: React.MouseEvent) => {
+export default function GalleryPage() {
+  const { photos } = usePhotos('gallery');
+
+  // Uploaded photos first; fall back to the built-in set when there are none yet.
+  const uploaded: GalleryItem[] = photos.map(p => ({ key: `db-${p.id}`, src: p.url, tall: p.tall }));
+  const defaults: GalleryItem[] = GALLERY_PHOTOS.map(p => ({ key: `default-${p.id}`, src: p.src, tall: p.tall }));
+  const items: GalleryItem[] = uploaded.length > 0 ? uploaded : defaults;
+
+  const [lightbox, setLightbox] = useState<GalleryItem | null>(null);
+  const [liked, setLiked] = useState<string[]>([]);
+
+  const toggleLike = (key: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setLiked(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    setLiked(prev => prev.includes(key) ? prev.filter(i => i !== key) : [...prev, key]);
   };
 
   return (
