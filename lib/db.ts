@@ -1,6 +1,21 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, type NeonQueryFunction } from '@neondatabase/serverless';
 
-export const sql = neon(process.env.DATABASE_URL!);
+let _sql: NeonQueryFunction<false, false> | null = null;
+
+/**
+ * Lazily create the Neon client on first use. Doing this at call time (instead
+ * of module import) means importing this file never throws when DATABASE_URL is
+ * absent — the route handlers can catch the error and respond gracefully.
+ */
+export const sql: NeonQueryFunction<false, false> = ((...args: unknown[]) => {
+  if (!_sql) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error('DATABASE_URL is not set');
+    _sql = neon(url);
+  }
+  // @ts-expect-error - forward tagged-template / query args to the real client
+  return _sql(...args);
+}) as NeonQueryFunction<false, false>;
 
 /* ------------------------------------------------------------------ */
 /* Videos (private Blob, streamed via /api/stream)                     */

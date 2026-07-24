@@ -7,10 +7,29 @@ interface LoadingScreenProps {
   onComplete: () => void;
 }
 
+interface Particle {
+  x0: string; y0: string; x1: string; y1: string; duration: number;
+}
+
 export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [quote, setQuote] = useState(LOADING_QUOTES[0]);
   const [progress, setProgress] = useState(0);
   const [quoteIndex, setQuoteIndex] = useState(0);
+  // Generated on the client only, so the randomized positions never cause a
+  // server/client hydration mismatch.
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 20 }, () => ({
+        x0: Math.random() * 100 + '%',
+        y0: Math.random() * 100 + '%',
+        x1: Math.random() * 100 + '%',
+        y1: Math.random() * 100 + '%',
+        duration: 3 + Math.random() * 4,
+      })),
+    );
+  }, []);
 
   useEffect(() => {
     const quoteInterval = setInterval(() => {
@@ -45,19 +64,19 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Animated background particles */}
+      {/* Animated background particles (client-only to avoid hydration mismatch) */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((p, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-[#E50914] rounded-full opacity-30"
-            initial={{ x: Math.random() * 100 + '%', y: Math.random() * 100 + '%' }}
+            initial={{ x: p.x0, y: p.y0 }}
             animate={{
-              y: [Math.random() * 100 + '%', Math.random() * 100 + '%'],
-              x: [Math.random() * 100 + '%', Math.random() * 100 + '%'],
+              y: [p.y0, p.y1],
+              x: [p.x0, p.x1],
               opacity: [0.1, 0.5, 0.1],
             }}
-            transition={{ duration: 3 + Math.random() * 4, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: p.duration, repeat: Infinity, ease: 'easeInOut' }}
           />
         ))}
       </div>

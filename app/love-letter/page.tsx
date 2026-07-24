@@ -25,11 +25,29 @@ I love you.
 Always and absolutely,
 Yours.`;
 
+interface AmbientHeart {
+  left: string; top: string; duration: number; delay: number;
+}
+
 export default function LoveLetterPage() {
   const [opened, setOpened] = useState(false);
   const [letterVisible, setLetterVisible] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [typewriterDone, setTypewriterDone] = useState(false);
+  // Generated on the client only so randomized positions don't cause a
+  // server/client hydration mismatch.
+  const [hearts, setHearts] = useState<AmbientHeart[]>([]);
+
+  useEffect(() => {
+    setHearts(
+      Array.from({ length: 12 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        duration: 4 + Math.random() * 4,
+        delay: Math.random() * 3,
+      })),
+    );
+  }, []);
 
   const handleEnvelope = () => {
     setOpened(true);
@@ -57,13 +75,13 @@ export default function LoveLetterPage() {
 
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
+        {hearts.map((h, i) => (
           <motion.div
             key={i}
             className="absolute text-[#E50914] opacity-5 text-4xl"
-            style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+            style={{ left: h.left, top: h.top }}
             animate={{ y: [0, -20, 0], opacity: [0.03, 0.08, 0.03], scale: [1, 1.2, 1] }}
-            transition={{ duration: 4 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
+            transition={{ duration: h.duration, repeat: Infinity, delay: h.delay }}
           >
             ❤️
           </motion.div>

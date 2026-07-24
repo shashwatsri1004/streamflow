@@ -37,7 +37,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const controlsTimer = useRef<ReturnType<typeof setTimeout>>();
+  const controlsTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);

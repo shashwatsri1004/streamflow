@@ -62,21 +62,21 @@ export default function GalleryPage() {
 
         {/* Masonry grid */}
         <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
-          {GALLERY_PHOTOS.map((photo, i) => (
+          {items.map((item, i) => (
             <motion.div
-              key={photo.id}
+              key={item.key}
               className="break-inside-avoid relative group cursor-pointer rounded-xl overflow-hidden mb-3"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4 }}
-              onClick={() => setLightbox(photo)}
+              onClick={() => setLightbox(item)}
               whileHover={{ scale: 1.02 }}
             >
               <img
-                src={photo.src}
-                alt={`Memory ${photo.id}`}
-                className={`w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105 ${photo.tall ? 'h-64 md:h-80' : 'h-36 md:h-48'}`}
+                src={item.src}
+                alt={`Memory ${i + 1}`}
+                className={`w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105 ${item.tall ? 'h-64 md:h-80' : 'h-36 md:h-48'}`}
               />
 
               {/* Overlay */}
@@ -85,14 +85,14 @@ export default function GalleryPage() {
               {/* Actions */}
               <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <motion.button
-                  onClick={e => toggleLike(photo.id, e)}
+                  onClick={e => toggleLike(item.key, e)}
                   className="w-8 h-8 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center"
                   whileHover={{ scale: 1.2 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <Heart
                     size={14}
-                    className={liked.includes(photo.id) ? 'text-[#E50914] fill-[#E50914]' : 'text-white'}
+                    className={liked.includes(item.key) ? 'text-[#E50914] fill-[#E50914]' : 'text-white'}
                   />
                 </motion.button>
                 <motion.button
@@ -146,18 +146,18 @@ export default function GalleryPage() {
                   <X size={18} />
                 </motion.button>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-[#808080] text-sm">Memory #{lightbox.id}</p>
+                  <p className="text-[#808080] text-sm">Our Moments</p>
                   <motion.button
-                    onClick={e => toggleLike(lightbox.id, e as any)}
+                    onClick={e => toggleLike(lightbox.key, e as any)}
                     className="flex items-center gap-2 text-sm"
                     whileHover={{ scale: 1.05 }}
                   >
                     <Heart
                       size={18}
-                      className={liked.includes(lightbox.id) ? 'text-[#E50914] fill-[#E50914]' : 'text-white'}
+                      className={liked.includes(lightbox.key) ? 'text-[#E50914] fill-[#E50914]' : 'text-white'}
                     />
-                    <span className={liked.includes(lightbox.id) ? 'text-[#E50914]' : 'text-white'}>
-                      {liked.includes(lightbox.id) ? 'Loved ❤️' : 'Love this'}
+                    <span className={liked.includes(lightbox.key) ? 'text-[#E50914]' : 'text-white'}>
+                      {liked.includes(lightbox.key) ? 'Loved ❤️' : 'Love this'}
                     </span>
                   </motion.button>
                 </div>
