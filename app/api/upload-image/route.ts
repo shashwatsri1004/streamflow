@@ -23,9 +23,10 @@ export async function POST(request: Request): Promise<NextResponse> {
         maximumSizeInBytes: 25 * 1024 * 1024, // 25 MB
         addRandomSuffix: true,
       }),
-      onUploadCompleted: async () => {
-        // No-op: the client persists the DB row after upload completes.
-      },
+      // No onUploadCompleted: the client persists the DB row itself once
+      // upload() resolves. Providing it would require a publicly reachable
+      // callback URL, which isn't available in preview/localhost and causes
+      // token generation to fail (stalling the upload).
     });
 
     return NextResponse.json(jsonResponse);
