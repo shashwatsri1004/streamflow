@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import CursorEffect from '@/components/CursorEffect';
+import { usePhotos } from '@/lib/useMediaAssets';
 
 const POLAROIDS = [
   { id: 1, src: 'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=400', caption: 'First Date ❤️', rotate: -3, x: 0, y: 0 },
@@ -15,8 +16,44 @@ const POLAROIDS = [
   { id: 8, src: 'https://images.pexels.com/photos/1121796/pexels-photo-1121796.jpeg?auto=compress&cs=tinysrgb&w=400', caption: 'Adventure 🌍', rotate: 2.5, x: -15, y: -8 },
 ];
 
+// Deterministic "scattered" offsets so uploaded polaroids look hand-pinned.
+const ROTATIONS = [-3, 2, -1.5, 3.5, -2, 1.5, -4, 2.5];
+const OFFSETS = [
+  { x: 0, y: 0 }, { x: 40, y: 20 }, { x: -20, y: 10 }, { x: 10, y: -5 },
+  { x: -30, y: 15 }, { x: 25, y: -10 }, { x: 5, y: 5 }, { x: -15, y: -8 },
+];
+
+interface PolaroidItem {
+  key: string;
+  src: string;
+  caption: string;
+  rotate: number;
+  x: number;
+  y: number;
+}
+
 export default function PolaroidPage() {
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const { photos } = usePhotos('polaroid');
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Uploaded polaroids first; fall back to the built-in set when there are none yet.
+  const uploaded: PolaroidItem[] = photos.map((p, i) => ({
+    key: `db-${p.id}`,
+    src: p.url,
+    caption: p.caption ?? '',
+    rotate: ROTATIONS[i % ROTATIONS.length],
+    x: OFFSETS[i % OFFSETS.length].x,
+    y: OFFSETS[i % OFFSETS.length].y,
+  }));
+  const defaults: PolaroidItem[] = POLAROIDS.map(p => ({
+    key: `default-${p.id}`,
+    src: p.src,
+    caption: p.caption,
+    rotate: p.rotate,
+    x: p.x,
+    y: p.y,
+  }));
+  const items: PolaroidItem[] = uploaded.length > 0 ? uploaded : defaults;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
@@ -52,11 +89,11 @@ export default function PolaroidPage() {
 
         {/* Polaroid grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
-          {POLAROIDS.map((photo, i) => {
-            const isExpanded = expanded === photo.id;
+          {items.map((photo, i) => {
+            const isExpanded = expanded === photo.key;
             return (
               <motion.div
-                key={photo.id}
+                key={photo.key}
                 className="cursor-pointer relative"
                 initial={{ opacity: 0, scale: 0.8, rotate: photo.rotate }}
                 whileInView={{ opacity: 1, scale: 1, rotate: photo.rotate }}
@@ -64,7 +101,7 @@ export default function PolaroidPage() {
                 transition={{ delay: i * 0.1, duration: 0.5, type: 'spring' }}
                 whileHover={{ rotate: 0, scale: 1.1, zIndex: 30, y: -10 }}
                 animate={isExpanded ? { scale: 2.5, rotate: 0, zIndex: 50 } : {}}
-                onClick={() => setExpanded(isExpanded ? null : photo.id)}
+                onClick={() => setExpanded(isExpanded ? null : photo.key)}
                 style={{ zIndex: isExpanded ? 50 : 'auto' }}
               >
                 {/* Polaroid frame */}
