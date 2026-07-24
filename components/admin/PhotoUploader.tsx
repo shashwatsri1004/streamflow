@@ -37,17 +37,20 @@ export default function PhotoUploader({ kind }: PhotoUploaderProps) {
     setMessage(null);
     try {
       const blob = await upload(`photos/${kind}/${file.name}`, file, {
-        access: 'public',
+        access: 'private',
         handleUploadUrl: '/api/upload-image',
         onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
       });
+
+      // Private blobs aren't directly viewable — serve them via the image proxy.
+      const proxyUrl = `/api/image?path=${encodeURIComponent(blob.pathname)}`;
 
       const res = await fetch('/api/photos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           kind,
-          url: blob.url,
+          url: proxyUrl,
           pathname: blob.pathname,
           caption: caption.trim() || null,
           tall,

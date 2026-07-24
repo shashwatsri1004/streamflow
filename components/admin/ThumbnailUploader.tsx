@@ -26,15 +26,18 @@ export default function ThumbnailUploader() {
     setMessage(null);
     try {
       const blob = await upload(`thumbnails/${movieId}-${file.name}`, file, {
-        access: 'public',
+        access: 'private',
         handleUploadUrl: '/api/upload-image',
         onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
       });
 
+      // Private blobs aren't directly viewable — serve them via the image proxy.
+      const proxyUrl = `/api/image?path=${encodeURIComponent(blob.pathname)}`;
+
       const res = await fetch('/api/thumbnails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movieId, url: blob.url, pathname: blob.pathname, fileName: file.name }),
+        body: JSON.stringify({ movieId, url: proxyUrl, pathname: blob.pathname, fileName: file.name }),
       });
       if (!res.ok) throw new Error('Failed to save the thumbnail.');
 

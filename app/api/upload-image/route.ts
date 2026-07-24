@@ -2,7 +2,8 @@ import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 
 // Client-upload handshake for images (gallery photos, polaroids, tile thumbnails).
-// Images are stored with PUBLIC access so they can be rendered directly in <img>.
+// The blob store is configured with PRIVATE access, so images are uploaded
+// privately and served back through the /api/image proxy route.
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
 
@@ -11,7 +12,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       body,
       request,
       onBeforeGenerateToken: async () => ({
-        access: 'public',
+        access: 'private',
         allowedContentTypes: [
           'image/jpeg',
           'image/png',
