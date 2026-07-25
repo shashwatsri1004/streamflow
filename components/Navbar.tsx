@@ -181,6 +181,8 @@ export default function Navbar() {
           <button
             className="lg:hidden text-white ml-2"
             onClick={() => setShowMobileMenu(v => !v)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={showMobileMenu}
           >
             <div className="space-y-1">
               <span className={`block w-5 h-0.5 bg-white transition-transform ${showMobileMenu ? 'translate-y-1.5 rotate-45' : ''}`} />
@@ -195,7 +197,7 @@ export default function Navbar() {
       <AnimatePresence>
         {showMobileMenu && (
           <motion.div
-            className="lg:hidden glassmorphism border-t border-white/10"
+            className="lg:hidden bg-[#141414] border-t border-white/10 overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

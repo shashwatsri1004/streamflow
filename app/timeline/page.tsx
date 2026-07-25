@@ -11,7 +11,7 @@ export default function TimelinePage() {
   const lineHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
   return (
-    <div className="min-h-screen bg-[#141414]">
+    <div className="min-h-screen bg-[#141414] overflow-x-hidden">
       <CursorEffect />
       <Navbar />
 
@@ -30,10 +30,10 @@ export default function TimelinePage() {
 
         {/* Timeline */}
         <div ref={containerRef} className="relative">
-          {/* Center line */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-[#333]" />
+          {/* Center line (left-aligned on mobile, centered on desktop) */}
+          <div className="absolute left-3 md:left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-[#333]" />
           <motion.div
-            className="absolute left-1/2 -translate-x-1/2 top-0 w-0.5 bg-gradient-to-b from-[#E50914] to-[#ff6b6b] origin-top"
+            className="absolute left-3 md:left-1/2 -translate-x-1/2 top-0 w-0.5 bg-gradient-to-b from-[#E50914] to-[#ff6b6b] origin-top"
             style={{ height: lineHeight }}
           />
 
@@ -44,16 +44,16 @@ export default function TimelinePage() {
               return (
                 <motion.div
                   key={event.id}
-                  className={`flex items-center gap-6 md:gap-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}
+                  className={`relative flex items-center gap-6 md:gap-12 pl-10 md:pl-0 flex-row ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                   initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-80px' }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                 >
                   {/* Content card */}
-                  <div className={`flex-1 ${isLeft ? 'text-right' : 'text-left'}`}>
+                  <div className={`flex-1 min-w-0 text-left ${isLeft ? 'md:text-right' : 'md:text-left'}`}>
                     <motion.div
-                      className="inline-block bg-[#1a1a1a] border border-white/10 rounded-2xl p-5 md:p-6 hover:border-[#E50914]/30 transition-colors cursor-default"
+                      className="block w-full md:inline-block md:w-auto bg-[#1a1a1a] border border-white/10 rounded-2xl p-5 md:p-6 hover:border-[#E50914]/30 transition-colors cursor-default"
                       whileHover={{ scale: 1.02, y: -2 }}
                     >
                       {event.image && (
@@ -68,17 +68,17 @@ export default function TimelinePage() {
                     </motion.div>
                   </div>
 
-                  {/* Center dot */}
+                  {/* Center dot (on the left line for mobile, centered for desktop) */}
                   <motion.div
-                    className="flex-shrink-0 w-5 h-5 bg-[#E50914] rounded-full border-4 border-[#141414] z-10 relative"
+                    className="flex-shrink-0 w-5 h-5 bg-[#E50914] rounded-full border-4 border-[#141414] z-10 absolute left-3 -translate-x-1/2 md:static md:translate-x-0"
                     whileInView={{ scale: [0, 1.3, 1] }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                     style={{ boxShadow: '0 0 12px rgba(229,9,20,0.6)' }}
                   />
 
-                  {/* Empty side */}
-                  <div className="flex-1" />
+                  {/* Empty side (desktop only) */}
+                  <div className="hidden md:block flex-1" />
                 </motion.div>
               );
             })}

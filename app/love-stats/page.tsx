@@ -53,7 +53,7 @@ export default function LoveStatsPage() {
   const [meterStarted, setMeterStarted] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#141414]">
+    <div className="min-h-screen bg-[#141414] overflow-x-hidden">
       <CursorEffect />
       <Navbar />
 
