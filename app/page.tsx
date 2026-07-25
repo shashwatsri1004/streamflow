@@ -141,7 +141,7 @@ export default function ProfilePage() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 0.6 }}
             >
-              &quot;Every Love Story Deserves Its Own Streaming Service.&quot;
+              &quot;Our Love Story Deserves Its Own Streaming Service.&quot;
             </motion.p>
           </div>
 
