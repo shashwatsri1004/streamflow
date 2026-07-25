@@ -322,7 +322,6 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                 src={realVideoUrl}
                 className="w-full h-full object-contain bg-black"
                 playsInline
-                // @ts-expect-error - iOS specific attribute
                 webkit-playsinline="true"
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={e => setDuration(e.currentTarget.duration)}
