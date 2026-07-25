@@ -65,7 +65,6 @@ export default function SpinWheelPage() {
           {/* Wheel */}
           <motion.div
             className="relative w-72 h-72 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl"
-            style={{ rotate: rotation }}
             animate={{ rotate: rotation }}
             transition={{ duration: 4, ease: [0.17, 0.67, 0.12, 0.99] }}
           >
