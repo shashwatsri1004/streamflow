@@ -35,7 +35,7 @@ export default function HeroBanner({ onPlay, onInfo }: HeroBannerProps) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-end pb-20 md:pb-20 px-4 md:px-16">
+      <div className="relative z-10 h-full flex flex-col justify-end pb-16 md:pb-20 px-3 sm:px-4 md:px-16">
         {/* Badge */}
         <motion.div
           className="flex items-center gap-2 mb-4"
@@ -55,7 +55,7 @@ export default function HeroBanner({ onPlay, onInfo }: HeroBannerProps) {
 
         {/* Title */}
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 leading-tight text-balance text-shadow-lg"
+          className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white mb-3 md:mb-4 leading-tight text-balance text-shadow-lg pr-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : 30 }}
           transition={{ delay: 0.4, duration: 0.7 }}
