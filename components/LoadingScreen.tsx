@@ -83,14 +83,14 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
       {/* Logo */}
       <motion.div
-        className="mb-12 relative"
+        className="mb-12 relative flex flex-col items-center justify-center"
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: 'easeOut' }}
       >
-        <div className="relative">
+        <div className="relative text-center">
           <span
-            className="text-7xl md:text-9xl font-black tracking-tight text-[#E50914]"
+            className="text-7xl md:text-9xl font-black tracking-tight text-[#E50914] inline-block"
             style={{
               textShadow: '0 0 40px rgba(229,9,20,0.8), 0 0 80px rgba(229,9,20,0.4)',
               fontFamily: 'Georgia, serif',
@@ -100,7 +100,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             TanyaTV
           </span>
           <motion.div
-            className="absolute inset-0 text-7xl md:text-9xl font-black tracking-tight text-[#E50914] opacity-20"
+            className="absolute inset-0 text-7xl md:text-9xl font-black tracking-tight text-[#E50914] opacity-20 flex items-center justify-center"
             style={{
               filter: 'blur(20px)',
               fontFamily: 'Georgia, serif',
