@@ -31,6 +31,15 @@ const NAV_LINKS = [
   { href: '/love-letter', label: 'Love Letter' },
 ];
 
+const MORE_LINKS = [
+  { href: '/bucket-list', label: 'Bucket List' },
+  { href: '/achievements', label: 'Achievements' },
+  { href: '/spin-wheel', label: 'Spin the Wheel' },
+  { href: '/love-meter', label: 'Love Meter' },
+  { href: '/polaroid', label: 'Polaroid Wall' },
+  { href: '/this-or-that', label: 'This or That' },
+];
+
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -44,6 +53,12 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Never leave the sheet open after a route change
+  useEffect(() => {
+    setShowMobileMenu(false);
+    setShowNotifications(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -135,7 +150,7 @@ export default function Navbar() {
             <AnimatePresence>
               {showNotifications && (
                 <motion.div
-                  className="absolute right-0 top-10 w-80 glassmorphism rounded-xl overflow-hidden shadow-2xl"
+                  className="absolute right-0 top-10 w-[min(20rem,calc(100vw-2rem))] glassmorphism rounded-xl overflow-hidden shadow-2xl"
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -203,23 +218,26 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-4 py-4 space-y-2">
-              {NAV_LINKS.map(link => (
+            <div className="px-4 py-3 max-h-[70dvh] overflow-y-auto overscroll-contain safe-b">
+              {[...NAV_LINKS, ...MORE_LINKS].map(link => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block py-2 text-sm text-[#b3b3b3] hover:text-white transition-colors"
+                  className={`block py-3 border-b border-white/5 text-sm transition-colors ${
+                    pathname === link.href ? 'text-white font-semibold' : 'text-[#b3b3b3] hover:text-white'
+                  }`}
                   onClick={() => setShowMobileMenu(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <Link href="/bucket-list" className="block py-2 text-sm text-[#b3b3b3] hover:text-white" onClick={() => setShowMobileMenu(false)}>Bucket List</Link>
-              <Link href="/achievements" className="block py-2 text-sm text-[#b3b3b3] hover:text-white" onClick={() => setShowMobileMenu(false)}>Achievements</Link>
-              <Link href="/spin-wheel" className="block py-2 text-sm text-[#b3b3b3] hover:text-white" onClick={() => setShowMobileMenu(false)}>Spin the Wheel</Link>
-              <Link href="/love-meter" className="block py-2 text-sm text-[#b3b3b3] hover:text-white" onClick={() => setShowMobileMenu(false)}>Love Meter</Link>
-              <Link href="/this-or-that" className="block py-2 text-sm text-[#b3b3b3] hover:text-white" onClick={() => setShowMobileMenu(false)}>This or That</Link>
-              <Link href="/birthday-surprise" className="block py-2 text-sm text-[#E50914] font-semibold" onClick={() => setShowMobileMenu(false)}>Birthday Surprise ❤️</Link>
+              <Link
+                href="/birthday-surprise"
+                className="block py-3 text-sm text-[#E50914] font-semibold"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Birthday Surprise ❤️
+              </Link>
             </div>
           </motion.div>
         )}

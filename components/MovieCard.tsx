@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Plus, ThumbsUp, ChevronDown, Heart } from 'lucide-react';
 import { Movie } from '@/lib/data';
@@ -15,6 +15,12 @@ export default function MovieCard({ movie, onSelect, index }: MovieCardProps) {
   const { thumbnails } = useThumbnails();
   const thumbnail = thumbnails[movie.id] || movie.image;
   const [hovered, setHovered] = useState(false);
+  // Phones fire synthetic mouseenter on tap, which would flash the hover panel.
+  const [canHover, setCanHover] = useState(false);
+
+  useEffect(() => {
+    setCanHover(window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  }, []);
   const [liked, setLiked] = useState(() => {
     if (typeof window === 'undefined') return false;
     const list = JSON.parse(localStorage.getItem('memflix-mylist') || '[]');
@@ -36,12 +42,23 @@ export default function MovieCard({ movie, onSelect, index }: MovieCardProps) {
 
   return (
     <motion.div
-      className="relative flex-shrink-0 w-36 md:w-44 lg:w-52 cursor-pointer"
+      className="relative flex-shrink-0 w-[42vw] max-w-[220px] sm:w-40 md:w-44 lg:w-52 cursor-pointer"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => canHover && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      /* On touch devices there is no hover panel, so the card itself must open the detail */
+      onClick={() => onSelect(movie)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(movie);
+        }
+      }}
+      aria-label={`Open ${movie.title}`}
     >
       {/* Card */}
       <motion.div

@@ -48,6 +48,9 @@
 
   html {
     scroll-behavior: smooth;
+    /* Stop mobile browsers from inflating text in landscape */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -57,6 +60,25 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Avoid the iOS/Android "grey flash" on every tap */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Nothing should ever be able to push the page sideways on a phone */
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  /* Comfortable tap targets on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    button,
+    a[role='button'],
+    [role='button'] {
+      touch-action: manipulation;
+    }
   }
 
   ::-webkit-scrollbar {
@@ -99,9 +121,11 @@
     @apply relative cursor-pointer rounded overflow-hidden transition-all duration-300;
   }
 
-  .movie-card:hover {
-    transform: scale(1.05);
-    z-index: 10;
+  @media (hover: hover) and (pointer: fine) {
+    .movie-card:hover {
+      transform: scale(1.05);
+      z-index: 10;
+    }
   }
 
   .glassmorphism {
@@ -126,6 +150,14 @@
     @apply overflow-x-auto pb-2;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-left: 1rem;
+  }
+
+  .row-container > * {
+    scroll-snap-align: start;
   }
 
   .row-container::-webkit-scrollbar {
@@ -141,6 +173,44 @@
   .text-shadow-lg {
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
   }
+
+  /* Respect notches / rounded corners / gesture bars */
+  .safe-b {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Fullscreen video: force a landscape (tilted) presentation on
+   phones whose browser refuses screen.orientation.lock().
+   The player is rotated 90deg and re-sized so it fills the screen.
+---------------------------------------------------------------- */
+.force-landscape {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vh;
+  height: 100vw;
+  width: 100dvh;
+  height: 100dvw;
+  transform-origin: left top;
+  transform: rotate(90deg) translateY(-100vw);
+  transform: rotate(90deg) translateY(-100dvw);
+}
+
+/* Native fullscreen backdrops should stay pure black */
+:fullscreen,
+:-webkit-full-screen {
+  background: #000;
+}
+
+video::-webkit-media-controls {
+  display: none !important;
 }
 
 /* Custom animations */

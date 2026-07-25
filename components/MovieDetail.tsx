@@ -35,13 +35,13 @@ export default function MovieDetail({ movie, onClose, onPlay }: MovieDetailProps
 
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="relative bg-[#181818] rounded-xl overflow-hidden max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="relative bg-[#181818] rounded-t-2xl sm:rounded-xl overflow-hidden max-w-2xl w-full max-h-[92dvh] sm:max-h-[90dvh] overflow-y-auto overscroll-contain shadow-2xl"
               initial={{ scale: 0.8, y: 50, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.8, y: 50, opacity: 0 }}
@@ -68,14 +68,16 @@ export default function MovieDetail({ movie, onClose, onPlay }: MovieDetailProps
                 </motion.button>
 
                 {/* Title overlay */}
-                <div className="absolute bottom-4 left-6 right-6">
-                  {movie.emoji && <span className="text-3xl mb-1 block">{movie.emoji}</span>}
-                  <h2 className="text-2xl md:text-3xl font-bold text-white text-shadow-lg">{movie.title}</h2>
+                <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-6">
+                  {movie.emoji && <span className="text-2xl sm:text-3xl mb-1 block">{movie.emoji}</span>}
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white text-balance text-shadow-lg">
+                    {movie.title}
+                  </h2>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="px-6 pb-8 pt-2">
+              <div className="px-4 sm:px-6 pb-8 pt-2 safe-b">
                 {/* Action buttons */}
                 <div className="flex flex-wrap items-center gap-3 mb-5">
                   <motion.button
@@ -168,7 +170,7 @@ export default function MovieDetail({ movie, onClose, onPlay }: MovieDetailProps
                 </div>
 
                 {/* Ratings row */}
-                <div className="mt-5 pt-5 border-t border-white/10 flex items-center gap-6">
+                <div className="mt-5 pt-5 border-t border-white/10 flex flex-wrap items-center gap-x-6 gap-y-4">
                   <div className="text-center">
                     <div className="flex items-center gap-1 text-yellow-400">
                       {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}

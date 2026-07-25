@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import CursorEffect from '@/components/CursorEffect';
@@ -35,6 +35,16 @@ interface PolaroidItem {
 export default function PolaroidPage() {
   const { photos } = usePhotos('polaroid');
   const [expanded, setExpanded] = useState<string | null>(null);
+  // The hand-pinned scatter offsets push photos off a phone screen, so drop them there.
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setCompact(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   // Uploaded polaroids first; fall back to the built-in set when there are none yet.
   const uploaded: PolaroidItem[] = photos.map((p, i) => ({
@@ -88,7 +98,7 @@ export default function PolaroidPage() {
         </motion.div>
 
         {/* Polaroid grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
           {items.map((photo, i) => {
             const isExpanded = expanded === photo.key;
             return (
@@ -100,14 +110,18 @@ export default function PolaroidPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5, type: 'spring' }}
                 whileHover={{ rotate: 0, scale: 1.1, zIndex: 30, y: -10 }}
-                animate={isExpanded ? { scale: 2.5, rotate: 0, zIndex: 50 } : {}}
+                animate={isExpanded ? { scale: compact ? 1.7 : 2.5, rotate: 0, zIndex: 50 } : {}}
                 onClick={() => setExpanded(isExpanded ? null : photo.key)}
                 style={{ zIndex: isExpanded ? 50 : 'auto' }}
               >
                 {/* Polaroid frame */}
                 <div
                   className="polaroid shadow-2xl"
-                  style={{ transform: `translateX(${photo.x}px) translateY(${photo.y}px)` }}
+                  style={{
+                    transform: compact
+                      ? 'none'
+                      : `translateX(${photo.x}px) translateY(${photo.y}px)`,
+                  }}
                 >
                   {/* Photo area */}
                   <div className="w-full aspect-square overflow-hidden bg-[#eee]">
