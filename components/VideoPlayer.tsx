@@ -1,7 +1,7 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, Volume2, VolumeX, Maximize, SkipForward, RotateCcw } from 'lucide-react';
+import { X, Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipForward, RotateCcw } from 'lucide-react';
 import { Movie } from '@/lib/data';
 import { useVideoAssets } from '@/lib/useVideoAssets';
 
@@ -49,6 +49,9 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
   const [showCredits, setShowCredits] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [videoError, setVideoError] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  // Set when the browser won't let us rotate the device: we tilt the player ourselves.
+  const [forceLandscape, setForceLandscape] = useState(false);
 
   // Reset state whenever a new movie opens
   useEffect(() => {
@@ -60,6 +63,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
     setShowCredits(false);
     setShowIntro(true);
     setVideoError(false);
+    setShowControls(true);
 
     const introTimer = setTimeout(() => {
       setShowIntro(false);
@@ -102,6 +106,55 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
     v.muted = muted;
   }, [volume, muted, realVideoUrl]);
 
+  const unlockOrientation = useCallback(() => {
+    const orientation = window.screen?.orientation as (ScreenOrientation & { unlock?: () => void }) | undefined;
+    try {
+      orientation?.unlock?.();
+    } catch {
+      /* not supported — nothing to undo */
+    }
+  }, []);
+
+  // Track native fullscreen changes (including the user pressing Esc / back)
+  useEffect(() => {
+    const handleChange = () => {
+      const active = Boolean(document.fullscreenElement || (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement);
+      setIsFullscreen(active);
+      if (!active) {
+        setForceLandscape(false);
+        unlockOrientation();
+      }
+    };
+    document.addEventListener('fullscreenchange', handleChange);
+    document.addEventListener('webkitfullscreenchange', handleChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleChange);
+      document.removeEventListener('webkitfullscreenchange', handleChange);
+    };
+  }, [unlockOrientation]);
+
+  // If the phone is physically rotated to landscape, drop our manual tilt.
+  useEffect(() => {
+    if (!forceLandscape) return;
+    const handleResize = () => {
+      if (window.innerWidth > window.innerHeight) setForceLandscape(false);
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, [forceLandscape]);
+
+  // Leave fullscreen when the player unmounts
+  useEffect(() => {
+    if (movie) return;
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    setForceLandscape(false);
+    unlockOrientation();
+  }, [movie, unlockOrientation]);
+
   const hasRealVideo = Boolean(realVideoUrl) && !videoError;
 
   const togglePlay = () => {
@@ -126,15 +179,16 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
     setProgress((v.currentTime / v.duration) * 100);
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Works for mouse AND touch, and stays correct while the player is tilted.
+  const seekFromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const pct = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const pct = forceLandscape
+      ? Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height))
+      : Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
     if (hasRealVideo && videoRef.current && videoRef.current.duration) {
       videoRef.current.currentTime = pct * videoRef.current.duration;
-      setProgress(pct * 100);
-    } else {
-      setProgress(pct * 100);
     }
+    setProgress(pct * 100);
   };
 
   const skipForward = () => {
@@ -146,35 +200,92 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
     }
   };
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = async () => {
     const el = containerRef.current;
+    const video = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
     if (!el) return;
-    if (!document.fullscreenElement) {
-      el.requestFullscreen?.();
-    } else {
-      document.exitFullscreen?.();
+
+    // Exit
+    if (document.fullscreenElement || forceLandscape) {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen?.();
+      }
+      setForceLandscape(false);
+      unlockOrientation();
+      return;
+    }
+
+    // Enter native fullscreen where possible
+    try {
+      const withWebkit = el as HTMLDivElement & { webkitRequestFullscreen?: () => void };
+      if (el.requestFullscreen) {
+        await el.requestFullscreen({ navigationUI: 'hide' });
+      } else if (withWebkit.webkitRequestFullscreen) {
+        withWebkit.webkitRequestFullscreen();
+      } else if (video?.webkitEnterFullscreen) {
+        // iOS Safari on iPhone: only the <video> can go fullscreen, and it
+        // handles the landscape rotation itself.
+        video.webkitEnterFullscreen();
+        return;
+      }
+    } catch {
+      /* fullscreen refused — we can still rotate below */
+    }
+
+    // Now try to actually turn the phone sideways.
+    const orientation = window.screen?.orientation as
+      | (ScreenOrientation & { lock?: (o: string) => Promise<void> })
+      | undefined;
+    let locked = false;
+    if (orientation?.lock) {
+      try {
+        await orientation.lock('landscape');
+        locked = true;
+      } catch {
+        locked = false;
+      }
+    }
+    // Fallback: tilt the player ourselves so the video fills the long edge.
+    if (!locked && window.innerHeight > window.innerWidth) {
+      setForceLandscape(true);
     }
   };
 
-  const handleMouseMove = () => {
+  // Reveal controls, then fade them out again.
+  const bumpControls = useCallback(() => {
     setShowControls(true);
     clearTimeout(controlsTimer.current);
-    controlsTimer.current = setTimeout(() => setShowControls(false), 3000);
+    controlsTimer.current = setTimeout(() => setShowControls(false), 3500);
+  }, []);
+
+  // Tapping the video toggles the controls instead of relying on hover.
+  const handleSurfaceTap = () => {
+    if (showControls) {
+      setShowControls(false);
+      clearTimeout(controlsTimer.current);
+    } else {
+      bumpControls();
+    }
   };
+
+  useEffect(() => () => clearTimeout(controlsTimer.current), []);
 
   const displayDuration = hasRealVideo ? duration : 90 * 60;
   const displayCurrent = hasRealVideo ? currentTime : (progress / 100) * displayDuration;
+  const tilted = forceLandscape;
 
   return (
     <AnimatePresence>
       {movie && (
         <motion.div
           ref={containerRef}
-          className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+          className={`fixed inset-0 z-[100] bg-black flex items-center justify-center ${
+            tilted ? 'force-landscape' : ''
+          }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onMouseMove={handleMouseMove}
+          onMouseMove={bumpControls}
         >
           {/* TanyaTV intro */}
           <AnimatePresence>
@@ -190,7 +301,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                   transition={{ duration: 1, ease: 'easeOut' }}
                 >
                   <span
-                    className="text-6xl md:text-8xl font-black text-[#E50914]"
+                    className="text-5xl sm:text-6xl md:text-8xl font-black text-[#E50914]"
                     style={{
                       fontFamily: 'Georgia, serif',
                       textShadow: '0 0 60px rgba(229,9,20,1), 0 0 120px rgba(229,9,20,0.5)',
@@ -211,7 +322,8 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                 src={realVideoUrl}
                 className="w-full h-full object-contain bg-black"
                 playsInline
-                onClick={togglePlay}
+                // @ts-expect-error - iOS specific attribute
+                webkit-playsinline="true"
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={e => setDuration(e.currentTarget.duration)}
                 onPlay={() => setPlaying(true)}
@@ -234,18 +346,28 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
             )}
           </div>
 
+          {/* Tap surface: shows/hides the controls (kept below them) */}
+          {!showIntro && !showCredits && (
+            <button
+              type="button"
+              aria-label={showControls ? 'Hide player controls' : 'Show player controls'}
+              className="absolute inset-0 z-[5] cursor-pointer"
+              onClick={handleSurfaceTap}
+            />
+          )}
+
           {/* Credits overlay */}
           <AnimatePresence>
             {showCredits && (
               <motion.div
-                className="absolute inset-0 bg-black/90 z-10 flex flex-col items-center justify-center overflow-y-auto"
+                className="absolute inset-0 bg-black/90 z-10 flex flex-col items-center justify-center overflow-y-auto px-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1 }}
               >
-                <div className="text-center py-20 space-y-2">
+                <div className="text-center py-16 space-y-2">
                   <motion.p
-                    className="text-[#E50914] text-sm tracking-widest uppercase mb-8"
+                    className="text-[#E50914] text-xs sm:text-sm tracking-widest uppercase mb-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
@@ -260,8 +382,8 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1 + i * 0.3 }}
                     >
-                      <p className="text-[#808080] text-sm tracking-wide">{credit.role}</p>
-                      <p className="text-white text-lg font-semibold">{credit.name}</p>
+                      <p className="text-[#808080] text-xs sm:text-sm tracking-wide">{credit.role}</p>
+                      <p className="text-white text-base sm:text-lg font-semibold">{credit.name}</p>
                     </motion.div>
                   ))}
                   <motion.div
@@ -270,7 +392,9 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1 + CREDITS.length * 0.3 }}
                   >
-                    <p className="text-2xl font-bold text-white mb-2">The Best Chapter Is Yet To Come ❤️</p>
+                    <p className="text-xl sm:text-2xl font-bold text-white mb-2 text-balance">
+                      The Best Chapter Is Yet To Come ❤️
+                    </p>
                     {hasRealVideo && (
                       <button
                         onClick={() => {
@@ -285,10 +409,7 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                         <RotateCcw size={16} /> Watch Again
                       </button>
                     )}
-                    <button
-                      onClick={onClose}
-                      className="netflix-btn-red px-8 py-3 rounded"
-                    >
+                    <button onClick={onClose} className="netflix-btn-red px-8 py-3 rounded">
                       Continue Watching
                     </button>
                   </motion.div>
@@ -308,16 +429,16 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                 transition={{ duration: 0.3 }}
               >
                 {/* Top bar */}
-                <div className="absolute top-0 left-0 right-0 p-4 md:p-6 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
-                  <div>
-                    <p className="text-[#808080] text-sm">Now Playing</p>
-                    <h3 className="text-white font-semibold text-lg">{movie.title}</h3>
+                <div className="absolute top-0 left-0 right-0 px-3 py-3 sm:px-6 sm:py-5 flex items-start justify-between gap-3 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
+                  <div className="min-w-0">
+                    <p className="text-[#808080] text-[11px] sm:text-sm">Now Playing</p>
+                    <h3 className="text-white font-semibold text-sm sm:text-lg truncate">{movie.title}</h3>
                   </div>
                   <motion.button
                     onClick={onClose}
-                    className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors"
-                    whileHover={{ scale: 1.1 }}
+                    className="w-10 h-10 shrink-0 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors"
                     whileTap={{ scale: 0.9 }}
+                    aria-label="Close player"
                   >
                     <X size={20} className="text-white" />
                   </motion.button>
@@ -328,8 +449,8 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                   <motion.button
                     onClick={togglePlay}
                     className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors pointer-events-auto"
-                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    aria-label={playing ? 'Pause' : 'Play'}
                   >
                     {playing ? (
                       <Pause size={24} className="text-white" />
@@ -340,91 +461,92 @@ export default function VideoPlayer({ movie, onClose }: VideoPlayerProps) {
                 </div>
 
                 {/* Bottom controls */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/90 to-transparent pointer-events-auto">
-                  {/* Progress bar */}
-                  <div className="mb-4 relative">
+                <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-8 sm:px-6 sm:pb-5 bg-gradient-to-t from-black/90 to-transparent pointer-events-auto safe-b">
+                  {/* Progress bar — generous touch target */}
+                  <div className="mb-3">
                     <div
-                      className="h-1 bg-white/30 rounded-full cursor-pointer hover:h-1.5 transition-all"
-                      onClick={handleSeek}
+                      className="group/seek -my-2 py-2 cursor-pointer touch-none"
+                      onPointerDown={seekFromPointer}
+                      role="slider"
+                      aria-label="Seek"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(progress)}
+                      tabIndex={0}
                     >
-                      <div
-                        className="h-full bg-[#E50914] rounded-full relative progress-bar"
-                        style={{ width: `${progress}%` }}
-                      >
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full -translate-x-1/2 shadow-lg" />
+                      <div className="h-1 bg-white/30 rounded-full group-hover/seek:h-1.5 transition-all">
+                        <div
+                          className="h-full bg-[#E50914] rounded-full relative progress-bar"
+                          style={{ width: `${progress}%` }}
+                        >
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full translate-x-1/2 shadow-lg" />
+                        </div>
                       </div>
                     </div>
-                    <div className="flex justify-between mt-1">
-                      <span className="text-[#808080] text-xs">{formatSeconds(displayCurrent)}</span>
-                      <span className="text-[#808080] text-xs">{formatSeconds(displayDuration)}</span>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-[#b3b3b3] text-[11px] tabular-nums">{formatSeconds(displayCurrent)}</span>
+                      <span className="text-[#b3b3b3] text-[11px] tabular-nums">{formatSeconds(displayDuration)}</span>
                     </div>
                   </div>
 
                   {/* Controls row */}
-                  <div className="flex items-center gap-4">
-                    <motion.button
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <button
                       onClick={togglePlay}
-                      className="text-white hover:text-[#E50914] transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      className="text-white hover:text-[#E50914] transition-colors p-1 -m-1"
+                      aria-label={playing ? 'Pause' : 'Play'}
                     >
                       {playing ? <Pause size={22} /> : <Play size={22} fill="white" />}
-                    </motion.button>
+                    </button>
 
-                    <motion.button
+                    <button
                       onClick={skipForward}
-                      className="text-white hover:text-[#E50914] transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      title="Skip 10s"
+                      className="text-white hover:text-[#E50914] transition-colors p-1 -m-1"
+                      aria-label="Skip forward 10 seconds"
                     >
                       <SkipForward size={20} />
-                    </motion.button>
+                    </button>
 
                     {/* Volume */}
                     <div className="flex items-center gap-2">
-                      <motion.button
+                      <button
                         onClick={() => setMuted(m => !m)}
-                        className="text-white hover:text-[#E50914] transition-colors"
-                        whileHover={{ scale: 1.1 }}
+                        className="text-white hover:text-[#E50914] transition-colors p-1 -m-1"
+                        aria-label={muted ? 'Unmute' : 'Mute'}
                       >
                         {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                      </motion.button>
+                      </button>
                       <input
                         type="range"
                         min="0"
                         max="100"
                         value={muted ? 0 : volume}
-                        onChange={e => { setVolume(Number(e.target.value)); setMuted(false); }}
+                        onChange={e => {
+                          setVolume(Number(e.target.value));
+                          setMuted(false);
+                        }}
                         className="w-20 accent-white hidden md:block"
+                        aria-label="Volume"
                       />
                     </div>
 
-                    <div className="ml-auto flex items-center gap-4">
-                      <span className="text-[#b3b3b3] text-xs border border-[#808080] px-2 py-0.5 rounded">
+                    <div className="ml-auto flex items-center gap-3 sm:gap-4">
+                      <span className="text-[#b3b3b3] text-[10px] sm:text-xs border border-[#808080] px-1.5 py-0.5 rounded">
                         {hasRealVideo ? 'HD' : 'Preview'}
                       </span>
-                      <motion.button
+                      <button
                         onClick={toggleFullscreen}
-                        className="text-white hover:text-[#E50914] transition-colors"
-                        whileHover={{ scale: 1.1 }}
+                        className="text-white hover:text-[#E50914] transition-colors p-1 -m-1"
+                        aria-label={isFullscreen || tilted ? 'Exit fullscreen' : 'Enter fullscreen'}
                       >
-                        <Maximize size={20} />
-                      </motion.button>
+                        {isFullscreen || tilted ? <Minimize size={20} /> : <Maximize size={20} />}
+                      </button>
                     </div>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Click to play/pause on poster (simulated mode only) */}
-          {!hasRealVideo && !showIntro && !showCredits && (
-            <div
-              className="absolute inset-0 z-[5] cursor-pointer"
-              onClick={togglePlay}
-            />
-          )}
         </motion.div>
       )}
     </AnimatePresence>
