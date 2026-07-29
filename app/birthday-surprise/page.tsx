@@ -16,7 +16,7 @@ I made this because I wanted you to feel, for just a moment, what it feels like 
 
 You are my favorite memory and my best dream at the same time.
 
-Happy Birthday, my love. I hope this year is as wonderful as you make mine feel every day.
+Happy Girlfriend's Day, my love. I hope this year is as wonderful as you make mine feel every day.
 
 I love you.
 Always.
@@ -332,7 +332,7 @@ export default function BirthdaySurprisePage() {
                 transition={{ delay: 1.5 }}
                 style={{ textShadow: '0 0 30px rgba(229,9,20,0.6)' }}
               >
-                Happy Birthday, My Love! 🎂
+                Happy Girlfriend's Day, My Love! 🎂
               </motion.p>
 
               <motion.div

@@ -16,9 +16,9 @@ I want you to know: I see you. All of you. The version of you that's confident a
 
 I love you for your laugh — the kind that comes from somewhere real. I love you for your kindness, which you give away so freely. I love you for how fiercely you care, even when caring is hard. I love you for the way you see the world, which is always a little more beautiful through your eyes.
 
-On this birthday, I don't just want to celebrate the day you were born. I want to celebrate every day since — every moment you've given me the privilege of knowing you. Every conversation that ran too long. Every memory we made without planning to. Every version of "us" that has slowly, quietly, become the most important thing in my life.
+On this Girlfriend's Day, I don't just want to celebrate the day you were born. I want to celebrate every day since — every moment you've given me the privilege of knowing you. Every conversation that ran too long. Every memory we made without planning to. Every version of "us" that has slowly, quietly, become the most important thing in my life.
 
-Happy Birthday, my love. May this year bring you everything you deserve — which is everything. All of it. More than you could ever ask for.
+Happy Girlfriend's Day, my love. May this year bring you everything you deserve — which is everything. All of it. More than you could ever ask for.
 
 I love you.
 
