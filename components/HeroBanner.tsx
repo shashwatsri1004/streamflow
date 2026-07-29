@@ -60,7 +60,7 @@ export default function HeroBanner({ onPlay, onInfo }: HeroBannerProps) {
           animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : 30 }}
           transition={{ delay: 0.4, duration: 0.7 }}
         >
-          Happy Birthday
+          Happy Girlfriend's Day
           <br />
           <span className="text-[#E50914]">My Love</span>{' '}
           <span className="animate-heartbeat inline-block">❤️</span>

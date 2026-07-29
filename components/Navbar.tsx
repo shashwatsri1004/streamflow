@@ -17,7 +17,7 @@ const NOTIFICATIONS: Notification[] = [
   { id: 1, text: 'New Memory Added ❤️', time: 'Just now', icon: '💝', unread: true },
   { id: 2, text: 'You smiled today. Achievement unlocked!', time: '2m ago', icon: '🏆', unread: true },
   { id: 3, text: 'Missing You — New voice note available', time: '1h ago', icon: '🎙️', unread: true },
-  { id: 4, text: 'New Episode Available: Birthday Surprise', time: '2h ago', icon: '🎂', unread: false },
+  { id: 4, text: 'New Episode Available: Girlfriends Day Surprise', time: '2h ago', icon: '🎂', unread: false },
   { id: 5, text: 'Achievement Unlocked: World\'s Cutest Human', time: '1d ago', icon: '🏆', unread: false },
 ];
 
@@ -114,7 +114,7 @@ export default function Navbar() {
               <Link href="/love-meter" className="block px-4 py-2 text-sm text-[#b3b3b3] hover:text-white hover:bg-white/5 transition-colors">Love Meter</Link>
               <Link href="/polaroid" className="block px-4 py-2 text-sm text-[#b3b3b3] hover:text-white hover:bg-white/5 transition-colors">Polaroid Wall</Link>
               <Link href="/this-or-that" className="block px-4 py-2 text-sm text-[#b3b3b3] hover:text-white hover:bg-white/5 transition-colors">This or That</Link>
-              <Link href="/birthday-surprise" className="block px-4 py-2 text-sm text-[#E50914] hover:text-[#F40612] hover:bg-white/5 transition-colors font-semibold">Birthday Surprise ❤️</Link>
+              <Link href="/birthday-surprise" className="block px-4 py-2 text-sm text-[#E50914] hover:text-[#F40612] hover:bg-white/5 transition-colors font-semibold">Girlfriend's Day Surprise ❤️</Link>
             </div>
           </div>
         </div>
