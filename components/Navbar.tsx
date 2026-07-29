@@ -236,7 +236,7 @@ export default function Navbar() {
                 className="block py-3 text-sm text-[#E50914] font-semibold"
                 onClick={() => setShowMobileMenu(false)}
               >
-                Birthday Surprise ❤️
+                Girlfriend's Day Surprise ❤️
               </Link>
             </div>
           </motion.div>
