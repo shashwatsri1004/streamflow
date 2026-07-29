@@ -221,7 +221,7 @@ export const ACHIEVEMENTS = [
 
 export const BUCKET_LIST = [
   { id: 'goa', title: 'Goa Together', description: 'Not the quick trip — the real one. Sunsets, seafood, and no plans.', image: img(0), progress: 60, status: 'In Progress' },
-  { id: 'rishikesh', title: 'Rishikesh', description: 'Mountains, river rafting, and watching the Ganga Aarti together.', image: img(1), progress: 20, status: 'Planned' },
+  { id: 'rishikesh', title: 'Mussoorie', description: 'Mountains, Mall Road, and watching the Waterfalls together.', image: img(1), progress: 20, status: 'Planned' },
   { id: 'manali', title: 'Manali', description: 'Snow, hot chocolate, and getting completely lost together.', image: img(2), progress: 10, status: 'Dreaming' },
   { id: 'cafe-hopping', title: 'Cafe Hopping', description: 'Every hidden cafe in the city. All the aesthetics. All the photos.', image: img(3), progress: 45, status: 'In Progress' },
   { id: 'movie-marathon', title: 'Movie Marathon', description: 'A whole weekend. No leaving the bed. All the movies. All the snacks.', image: img(4), progress: 70, status: 'Ongoing' },
