@@ -118,7 +118,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Every Love Story Deserves Its Own Streaming Service
+          Our Love Story Deserves Its Own Streaming Service
         </motion.p>
       </motion.div>
 
