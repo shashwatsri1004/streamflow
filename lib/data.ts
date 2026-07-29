@@ -276,8 +276,8 @@ export const SEARCH_RESULTS: Record<string, { title: string; subtitle: string; e
 
 export const LOVE_STATS = {
   daysTogether: 820,
-  hoursTalking: 8760,
-  photosTaken: 2847,
+  hoursTalking: 11000,
+  photosTaken: 6000,
   videosEdited: 47,
   laughsShared: 99999,
   argumentsWon: 0,
